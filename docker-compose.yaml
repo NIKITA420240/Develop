@@ -1,0 +1,38 @@
+services:
+  # Сервис Базы Данных
+  db:
+    image: postgres:15
+    container_name: weather_db_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weather_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Оставляем доступ снаружи для отладки
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Сервис Твоего Приложения
+  app:
+    build: .
+    container_name: weather_app_container
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      # ВАЖНО: тут хост 'db', потому что так называется сервис выше
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/weather_db
+      # Вставь сюда свой реальный ключ
+      OPENWEATHER_API_KEY: "69f16b8c1709a69d8a2166066035b82a"
+    volumes:
+      - .:/app  # Чтобы изменения в коде подтягивались без пересборки (удобно при разработке)
+
+volumes:
+  postgres_data:
