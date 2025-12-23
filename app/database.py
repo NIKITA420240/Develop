@@ -6,7 +6,7 @@ import os
 # Формат: postgresql+asyncpg://user:password@host:port/dbname
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@db:5432/weather_db")
 
-engine = create_async_engine(DATABASE_URL, echo=True) # echo=True выводит SQL запросы в консоль (удобно для отладки)
+engine = create_async_engine(DATABASE_URL) # echo=True выводит SQL запросы в консоль (удобно для отладки)
 
 # Фабрика сессий
 async_session_factory = async_sessionmaker(
